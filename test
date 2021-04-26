@@ -1,0 +1,239 @@
+int valueNumber(List *lp, double *vp) {
+  if (*lp != NULL && (*lp)->tt == Number ) {
+    *vp = ((*lp)->t).number;
+    *lp = (*lp)->next;
+    return 1;
+  }
+  return 0;
+}
+
+int treeFactor(List *lp, ExpTree *tp) { 
+  double w;
+  char *s;
+  Token t;
+  if ( valueNumber(lp,&w) ) {
+    t.number = (int)w;
+    *tp = newExpTreeNode(Number, t, NULL, NULL);
+    return 1;
+  }
+  if ( valueIdentifier(lp,&s) ) {
+    t.identifier = s;
+    *tp = newExpTreeNode(Identifier, t, NULL, NULL);
+    return 1;
+  }
+  if ( !acceptCharacter(lp,'(') )
+    return 0;
+  if ( !treeExpression(lp,tp) )
+    return 0;
+  return acceptCharacter(lp,')');
+}
+    
+
+int treeTerm(List *lp, ExpTree *tp) {
+  ExpTree tr;
+  Token t;
+  if ( !treeFactor(lp,tp) )
+    return 0;
+  tr = *tp;
+  while ( *lp != NULL ) {
+    if ( acceptCharacter(lp,'*') ) {
+      if ( treeFactor(lp,tp) ) {
+        t.symbol = '*';
+        tr = newExpTreeNode(Symbol, t, tr, *tp);
+      } else
+        return 0;
+    } else if ( acceptCharacter(lp,'/') ) {
+      if ( treeFactor(lp,tp) ) {
+        t.symbol = '/';
+        tr = newExpTreeNode(Symbol, t, tr, *tp);
+      } else
+        return 0;
+    } else {
+      *tp = tr;
+      return 1;
+    }
+  }
+  *tp = tr;
+  return 1;
+}
+
+class ExpressionTree(object):
+    def __init__(self, data, left, right):
+        self.data = data
+        self.left = left
+        self.right = right
+
+    def newExpTreeNode(self, data, left, right):
+        return ExpressionTree(data, left, right)
+    
+    def isVariable(self, s):
+        connectives = ['⊐', '∧', '∨', '∼']
+        if s in connectives:
+            return True
+        else:
+            return False
+    
+    def treeFactor(lp, tp):
+        if isVariable(lp):
+            tp = newExpTreeNode(lp, NULL, NULL)
+            return 1
+        if isNegation(lp)
+            if isVariable(lp):
+                return 1
+            else return 0
+        if not acceptCharacter(lp, "("):
+            return 0
+        if not treeExpression(lp):
+            return 0
+        return acceptCharacter(lp, ")")
+
+    def treeTerm(lp, tp):
+        if treeFactor(lp, tp):
+            return 0
+        tr = tp
+        while lp not NULL:
+            if acceptCharacter(lp, "⊐"):
+                if treeFactor(lp, tp):
+                    tr = newExpTreeNode(tr, tp)
+                else:
+                    return 0
+            else:
+                tp = tr
+                return 1
+        tp = tr
+        return 1
+
+    def treeExpression(lp, tp):
+        if not treeTerm(lp, tp):
+            return 0
+        tr = tp
+        while lp not NULL:
+            if acceptCharacter(lp, "∧"):
+                if treeTerm(lp, tp):
+                    tr = newExpTreeNode(tr, tp)
+                else:
+                    return 0
+            elif acceptCharacter(lp, "∨"):
+                if treeTerm(lp, tp):
+                    tr = newExpTreeNode(tr, tp)
+                else:
+                    return 0
+            else:
+                tp = tr
+                return 1
+        tp = tr
+        return 1
+
+ExpTree newExpTreeNode(TokenType tt, Token t, ExpTree tL, ExpTree tR) {
+  ExpTree new = malloc(sizeof(ExpTreeNode));
+  assert (new!=NULL);
+  new->tt = tt;
+  new->t = t;
+  new->left = tL;
+  new->right = tR;
+  return new;
+}
+
+typedef struct ExpTreeNode {
+  TokenType tt;
+  Token t;
+  ExpTree left;
+  ExpTree right;
+} ExpTreeNode;
+
+int treeExpression(List *lp, ExpTree *tp) {
+  ExpTree tr;
+  Token t;
+  if ( !treeTerm(lp,tp) )
+    return 0;
+  tr = *tp;
+  while ( *lp != NULL ) {
+    if ( acceptCharacter(lp,'+') ) {
+      if ( treeTerm(lp,tp) ) {
+        t.symbol = '+';
+        tr = newExpTreeNode(Symbol, t, tr, *tp);
+      } else
+        return 0;
+    } else if ( acceptCharacter(lp,'-') ) {
+      if ( treeTerm(lp,tp) ) {
+        t.symbol = '-';
+        tr = newExpTreeNode(Symbol, t, tr, *tp);
+      } else
+        return 0;
+    } else {
+      *tp = tr;
+      return 1;
+    }
+  }
+  *tp = tr;
+  return 1;
+}
+
+
+class ExpressionTree(object):
+    def __init__(self, data, left, right):
+        self.data = data
+        self.left = left
+        self.right = right
+
+    def newExpTreeNode(self, data, left, right):
+        return ExpressionTree(data, left, right)
+    
+    def isVariable(self, s):
+        connectives = ['⊐', '∧', '∨', '∼']
+        if s in connectives:
+            return True
+        else:
+            return False
+    
+    def treeFactor(lp, tp):
+        if isVariable(lp):
+            tp = newExpTreeNode(lp, NULL, NULL)
+            return 1
+        if acceptCharacter(lp, "∼"):
+            if isVariable(lp):
+                return 1
+            else:
+                return 0
+        if not acceptCharacter(lp, "("):
+            return 0
+        if not treeExpression(lp):
+            return 0
+        return acceptCharacter(lp, ")")
+
+    def treeTerm(lp, tp):
+        if treeFactor(lp, tp):
+            return 0
+        tr = tp
+        while lp not NULL:
+            if acceptCharacter(lp, "∧"):
+                if treeFactor(lp, tp):
+                    tr = newExpTreeNode(tr, tp)
+                else:
+                    return 0
+            elif acceptCharacter(lp, "∨"):
+                if treeFactor(lp, tp):
+                    tr = newExpTreeNode(tr, tp)
+                else:
+                    return 0
+            else:
+                tp = tr
+                return 1
+        tp = tr
+        return 1
+
+    def treeExpression(lp, tp):
+        if not treeTerm(lp, tp):
+            return 0
+        tr = tp
+        while lp not NULL:
+            if acceptCharacter(lp, "⊐"):
+                if treeTerm(lp, tp):
+                    tr = newExpTreeNode(tr, tp)
+                else:
+                    return 0
+            else:
+                tp = tr
+                return 1
+        tp = tr
+        return 1
