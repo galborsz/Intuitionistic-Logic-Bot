@@ -1,86 +1,65 @@
-
-
-class ExpressionTree(object):
-    def __init__(self, data, left, right):
+class BinaryTree:
+    def __init__(self, data, left=None, right=None):
         self.data = data
         self.left = left
         self.right = right
-
-    def inorder(self):
-        # inorder traversal of expression tree
-        # inorder traversal = > left, root, right
-        if self.data == None:
+    
+# A function to do inorder tree traversal
+def printInorder(tree):
+    if tree:
+        print("type in function: ", type(tree))
+        if tree.data == None:
             return
-        self.left.inorder()
-        print(self.data)
-        self.right.inorder()
-    
-def isConnective(s):
-    connectives = ['⊐', '∧', '∨', '∼']
-    if s in connectives:
-        return True
-    else:
-        return False
-
-def isVariable(s):
-    variables = ['p', 'q', 'r', 's']
-    if s in variables:
-        return True
-    else:
-        return False
-
-def treeFactor(formula):
-    if isVariable(formula):
-        return ExpressionTree(formula, None, None)
-    if formula[0] == "∼":
-        if isVariable(formula):
-            return ExpressionTree("∼", formula, None)
         else:
-            tree = treeFactor(formula)
-            return ExpressionTree("∼", tree, None)
-    elif formula[0] == "(":
-        return treeExpression(formula)
-
-def treeTerm(formula):
-    lefttree = treeFactor(formula)
-    for i in range(0, len(formula)):
-        if formula[i] == "∧":
-            righttree = treeFactor(formula)
-            return ExpressionTree("∧", lefttree, righttree)
-        if formula[i] == "∨":
-            righttree = treeFactor(formula)
-            return ExpressionTree("∨", lefttree, righttree)
-    return lefttree
+            # First recur on left child
+            printInorder(tree.left)
     
-    if formula[0] == "∧":
-        righttree = treeFactor(formula)
-        return ExpressionTree("∧", lefttree, righttree)
-    elif formula[0] == "∨":
-        righttree = treeFactor(formula)
-        return ExpressionTree("∨", lefttree, righttree)
-    else:
-        return lefttree
+            # then print the data of node
+            print("type data: ", type(tree.data))
+            print(tree.data)
+    
+            # now recur on right child
+            printInorder(tree.right)
 
-def treeExpression(formula):
-    lefttree = treeTerm(formula)
-    for i in range(0, len(formula)):
-        if formula[i] == "⊐":
-            righttree = treeTerm(formula[i:])
-            return ExpressionTree("⊐", lefttree, righttree)
-    return lefttree
+def convertIntoTree(formula):
+    # symbols definition
+    variables = ['p', 'q', 'r', 's']
+    connectives = ['⊐', '∧', '∨', '∼']
+
+    stack = [] #for storing temporal symbols
+    for i in range(len(formula)):
+        if formula[i] in (connectives + variables):
+            element = formula[i]
+            if element == "∼" and formula[i+1] != "(":
+                element = BinaryTree("∼", formula[i+1])
+                i+=1
+            stack.append(element)
+        elif formula[i] == ")": #pop stack and create tree
+            rightchild = BinaryTree(stack.pop())
+            connective = stack.pop()
+            if connective == "∼":
+                rightchild = BinaryTree("∼", rightchild)
+                connective = stack.pop()
+            leftchild = BinaryTree(stack.pop())
+            tree = BinaryTree(connective, leftchild, rightchild)
+            stack.append(tree)
+    tree = BinaryTree(stack.pop())
+    print("type inside: ", type(tree))
+    return tree
 
 def main():
     print("Let's start!")
     # generate formula
-    length = 1
     variables = ['p', 'q', 'r', 's']
     connectives = ['⊐', '∧', '∨', '∼']
+
     # construct expression tree to represent the formula
     # Iterate over the string
     #formula = "p⊐∼∼p"
-    formula = "p"
-    tree = treeExpression(formula)
-    tree.inorder()
+    formula = "p⊐(q∧s)"
+    tree = convertIntoTree(formula)
+    print("type outside: ", type(tree))
+    printInorder(tree)
     # test validity of formula (using the expression tree)
     # post it in twitter
 
