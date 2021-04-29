@@ -7,7 +7,6 @@ class BinaryTree:
 # A function to do inorder tree traversal
 def printInorder(tree):
     if tree:
-        print("type in function: ", type(tree))
         if tree.data == None:
             return
         else:
@@ -15,7 +14,6 @@ def printInorder(tree):
             printInorder(tree.left)
     
             # then print the data of node
-            print("type data: ", type(tree.data))
             print(tree.data)
     
             # now recur on right child
@@ -30,8 +28,12 @@ def convertIntoTree(formula):
     for i in range(len(formula)):
         if formula[i] in (connectives + variables):
             element = formula[i]
+            print("element: ", element)
             if element == "∼" and formula[i+1] != "(":
                 element = BinaryTree("∼", formula[i+1])
+                print("tree: ")
+                printInorder(element)
+                print("end tree")
                 i+=1
             stack.append(element)
         elif formula[i] == ")": #pop stack and create tree
@@ -43,8 +45,10 @@ def convertIntoTree(formula):
             leftchild = BinaryTree(stack.pop())
             tree = BinaryTree(connective, leftchild, rightchild)
             stack.append(tree)
-    tree = BinaryTree(stack.pop())
-    print("type inside: ", type(tree))
+    rightchild = BinaryTree(stack.pop())
+    connective = stack.pop()
+    leftchild = BinaryTree(stack.pop())
+    tree = BinaryTree(connective, leftchild, rightchild)
     return tree
 
 def main():
@@ -55,10 +59,10 @@ def main():
 
     # construct expression tree to represent the formula
     # Iterate over the string
-    #formula = "p⊐∼∼p"
+    #formula = "p⊐∼p"
     formula = "p⊐(q∧s)"
+    #formula = "p∧q"
     tree = convertIntoTree(formula)
-    print("type outside: ", type(tree))
     printInorder(tree)
     # test validity of formula (using the expression tree)
     # post it in twitter
