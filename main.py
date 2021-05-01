@@ -1,71 +1,78 @@
-class BinaryTree:
-    def __init__(self, data, left=None, right=None):
+class TreeNode:
+    def __init__(self, data):
         self.data = data
-        self.left = left
-        self.right = right
-    
-# A function to do inorder tree traversal
-def printInorder(tree):
-    if tree:
-        if tree.data == None:
-            return
-        else:
-            # First recur on left child
-            printInorder(tree.left)
-    
-            # then print the data of node
-            print(tree.data)
-    
-            # now recur on right child
-            printInorder(tree.right)
+        self.left = None
+        self.right = None
+        self.parent = None
 
-def convertIntoTree(formula):
+    def print_tree(self):
+        if self.left:
+            self.left.print_tree()
+        print(self.data)
+        if self.right:
+            self.right.print_tree()
+
+    def add_child_left(self, left):
+        left.parent = self
+        self.left = left
+    
+    def add_child_right(self, right):
+        right.parent = self
+        self.right = right
+
+def get_subtree(stack):
+    rightchild = stack.pop()
+    if isinstance(rightchild, str):
+        rightchild = TreeNode(rightchild)
+    connective = stack.pop()
+    if connective == "∼":
+        negation = TreeNode("∼")
+        negation.add_child_right(rightchild)
+        rightchild = negation
+        connective = stack.pop()
+    leftchild = stack.pop()
+    if isinstance(leftchild, str):
+        leftchild = TreeNode(leftchild)
+    tree = TreeNode(connective)
+    tree.add_child_left(leftchild)
+    tree.add_child_right(rightchild)
+    return tree
+
+def build_tree(formula):
     # symbols definition
     variables = ['p', 'q', 'r', 's']
     connectives = ['⊐', '∧', '∨', '∼']
 
-    stack = [] #for storing temporal symbols
+    stack = [] # for storing temporal symbols
+    q = 0
     for i in range(len(formula)):
-        if formula[i] in (connectives + variables):
-            element = formula[i]
-            print("element: ", element)
-            if element == "∼" and formula[i+1] != "(":
-                element = BinaryTree("∼", formula[i+1])
-                print("tree: ")
-                printInorder(element)
-                print("end tree")
-                i+=1
-            stack.append(element)
-        elif formula[i] == ")": #pop stack and create tree
-            rightchild = BinaryTree(stack.pop())
-            connective = stack.pop()
-            if connective == "∼":
-                rightchild = BinaryTree("∼", rightchild)
-                connective = stack.pop()
-            leftchild = BinaryTree(stack.pop())
-            tree = BinaryTree(connective, leftchild, rightchild)
-            stack.append(tree)
-    rightchild = BinaryTree(stack.pop())
-    connective = stack.pop()
-    leftchild = BinaryTree(stack.pop())
-    tree = BinaryTree(connective, leftchild, rightchild)
+        if q < len(formula):
+            if formula[q] in (connectives + variables):
+                element = formula[q]
+                negation = TreeNode("∼")
+                if formula[q] == "∼" and formula[q+1] != "(":
+                    element = negation
+                while formula[q] == "∼" and formula[q+1] != "(":
+                    afternegation = TreeNode(formula[q+1])
+                    negation.add_child_right(afternegation)
+                    negation = negation.right
+                    q+=1
+                stack.append(element)
+            elif formula[q] == ")": #pop stack and create tree
+                tree = get_subtree(stack)
+                stack.append(tree)
+        q+=1
+
+    tree = get_subtree(stack)
     return tree
 
+
 def main():
-    print("Let's start!")
-    # generate formula
-    variables = ['p', 'q', 'r', 's']
-    connectives = ['⊐', '∧', '∨', '∼']
-
-    # construct expression tree to represent the formula
-    # Iterate over the string
-    #formula = "p⊐∼p"
-    formula = "p⊐(q∧s)"
+    #formula = "∼∼∼∼p⊐(q∧s)"
+    formula = "p⊐∼(q∧s)"
     #formula = "p∧q"
-    tree = convertIntoTree(formula)
-    printInorder(tree)
-    # test validity of formula (using the expression tree)
-    # post it in twitter
+    tree = build_tree(formula)
+    tree.print_tree()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
