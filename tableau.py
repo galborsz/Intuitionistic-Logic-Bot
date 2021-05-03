@@ -10,7 +10,7 @@ class Formula:
 class Data:
     def __init__(self):
         self.formulas = []
-        self.worlds = 0 # use it as a counter instead of a list ?
+        self.worlds = 0 # use it as a counter instead of as a list ?
         self.relations = []
         self.valuations = {}
 
@@ -20,18 +20,20 @@ class Data:
     
     def add_world(self):
         self.worlds += 1
-        # reflexive rule
+        # reflexive rule applied every time a new world is introduced
         for i in range(self.worlds):
             self.add_relation(i, i)
-        #if world not in self.worlds:
-            #self.worlds.append(formula)
     
     def add_relation(self, first_world, second_world):
         if tuple([first_world, second_world]) not in self.relations:
             self.relations.append(tuple([first_world, second_world]))
         
     def add_valuation(self, variable, world, value):
+        if (variable, world) in self.valuations:
+            if self.valuations[(variable, world)] == False and value == True:
+                return False
         self.valuations[(variable, world)] = value
+        return True
 
 def create_initial_tableau_node(formula):
     tableau_node = TreeNode(Data())
@@ -45,9 +47,9 @@ def apply_rule(previous_node, symbol, assignation):
     new_node.data.formulas = previous_node.data.formulas
     new_node.data.worlds = previous_node.data.worlds
     new_node.data.relations = previous_node.data.relations
+    new_node.data.valuations = previous_node.data.valuations
 
     formula = new_node.data.formulas.pop(0)
-    print("formulas: ", formula.tree.inorder())
     if symbol == '⊐' and assignation == False:
         new_node.data.add_formula(Formula(formula.tree.left, formula.world+1, True))
         new_node.data.add_formula(Formula(formula.tree.right, formula.world+1, False))
@@ -83,7 +85,6 @@ def iterative_preorder(root):
          
         # Pop the top item from stack and print it
         symbol = nodeStack.pop()
-        print("symbol tree: ", symbol.data, end="\n")
 
         # create node
         new_node = apply_rule(previous_node, symbol.data, False)
@@ -95,3 +96,19 @@ def iterative_preorder(root):
             nodeStack.append(symbol.right)
         if symbol.left is not None:
             nodeStack.append(symbol.left)
+    
+        # apply heredity rule
+        variables = []
+        worlds = []
+        for element in new_node.data.valuations:
+            for relation in new_node.data.relations:
+                if element[1] == relation[0] and relation[0] != relation[1]:
+                    variables.append(element[0])
+                    worlds.append(relation[1])
+          
+        for variable, world in zip(variables, worlds):
+            added = new_node.data.add_valuation(variable, world, True)
+            if not added:
+                return False
+    
+    return True

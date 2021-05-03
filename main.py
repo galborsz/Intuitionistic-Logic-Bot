@@ -8,7 +8,11 @@ def main():
     tree = build_tree(formula)
     
     # apply tableau method to tree formula
-    iterative_preorder(tree)
+    validity = iterative_preorder(tree)
+    if validity:
+        print(formula, " is not a tautology")
+    else:
+        print(formula, " is a tautology")
 
 if __name__ == '__main__':
     main()
