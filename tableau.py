@@ -30,7 +30,8 @@ class Interpretation:
         
     def add_valuation(self, variable, world, value):
         if (variable, world) in self.valuations:
-            if self.valuations[(variable, world)] == False and value == True:
+            #if self.valuations[(variable, world)] == False and value == True:
+            if self.valuations[(variable, world)] != value:
                 return False
         self.valuations[(variable, world)] = value
         return True
