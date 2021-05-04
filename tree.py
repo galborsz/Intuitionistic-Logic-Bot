@@ -35,6 +35,7 @@ class TreeNode:
         self.right = right
 
 def get_subtree(stack):
+    tree = None
     rightchild = stack.pop()
     if isinstance(rightchild, str):
         rightchild = TreeNode(rightchild)
@@ -43,13 +44,21 @@ def get_subtree(stack):
         negation = TreeNode("∼")
         negation.add_child_right(rightchild)
         rightchild = negation
-        connective = stack.pop()
-    leftchild = stack.pop()
-    if isinstance(leftchild, str):
-        leftchild = TreeNode(leftchild)
-    tree = TreeNode(connective)
-    tree.add_child_left(leftchild)
-    tree.add_child_right(rightchild)
+        if stack:
+            connective = stack.pop()
+            tree = TreeNode(connective)
+            tree.add_child_right(rightchild)
+        else:
+            tree = rightchild
+    else:
+        tree = TreeNode(connective)
+        tree.add_child_right(rightchild)
+    if stack:
+        leftchild = stack.pop()
+        if isinstance(leftchild, str):
+            leftchild = TreeNode(leftchild)
+        tree.add_child_left(leftchild)
+    
     return tree
 
 def build_tree(formula):
