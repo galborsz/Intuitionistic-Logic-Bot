@@ -80,7 +80,13 @@ def build_tree(formula):
                     negation.add_child_right(afternegation)
                     negation = negation.right
                     q+=1
-                stack.append(element)
+                if formula[q+1] == "(":
+                    negation = element
+                    while negation:
+                        stack.append(negation.data)
+                        negation = negation.right
+                else:
+                    stack.append(element)
             elif formula[q] == ")": #pop stack and create tree
                 tree = get_subtree(stack)
                 stack.append(tree)

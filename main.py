@@ -7,7 +7,8 @@ def main():
     #formula = "∼p⊐(p⊐q)"
     #formula = "(p∧∼p)⊐q"
     #formula = "p⊐(q∨∼q)"
-    formula = "∼(p∧∼p)"
+    #formula = "∼(p∧∼p)"
+    formula = "∼∼(p∨∼p)"
     #formula = "p⊐q"
 
     # convert formula to tree

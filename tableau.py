@@ -65,12 +65,15 @@ def apply_rule(previous_node, symbol, formula):
         for relation in new_right_node.data.relations:
             if relation[0] == formula.world:
                 new_right_node.data.add_formula(Formula(formula.tree.right, relation[1], False))
+        print("old formula: ")
+        formula.tree.inorder()
+        new_right_node.data.add_formula(formula) # should be kept alwaaays
             
 
     elif symbol == '∼' and formula.assignation == False:
         print("rule ∼ -")
         new_right_node.data.add_formula(Formula(formula.tree.right, formula.world+1, True))
-        new_right_node.data.add_relation(new_right_node.data.worlds, new_right_node.data.worlds+1)
+        new_right_node.data.add_relation(formula.world, formula.world+1)
         new_right_node.data.add_world()
     
     elif symbol == '∧' and formula.assignation == True:
@@ -141,11 +144,11 @@ def iterative_preorder(root):
             previous_node.add_child_right(new_right_node)
             previous_node.add_child_left(new_left_node)
         """
-        new_right_node= apply_rule(previous_node, symbol.data, formula)
+        new_right_node = apply_rule(previous_node, symbol.data, formula)
         if not new_right_node:
             return False
         previous_node.add_child_right(new_right_node)
-
+        
         # Push right and left children of the popped node
         # to stack
         if symbol.right is not None:
