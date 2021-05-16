@@ -16,7 +16,6 @@ def main():
     
     # convert formula to tree
     tree = build_tree(formula)
-    #tree.inorder()
 
 
     # apply tableau method to tree formula
