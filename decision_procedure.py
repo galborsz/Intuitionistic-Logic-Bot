@@ -70,9 +70,9 @@ def rules(old_interpretation, formula, connective, interpretations):
          
     elif connective == '⊐' and formula.assignation == True:
         first_new_interpretation = copy_interpretation(old_interpretation)
-        first_new_interpretation.permanent_formulas(formula)
+        first_new_interpretation.add_permanent_formula(formula)
         second_new_interpretation = copy_interpretation(old_interpretation)
-        second_new_interpretation.permanent_formulas(formula)
+        second_new_interpretation.add_permanent_formula(formula)
         for relation in old_interpretation.relations:
             if relation[0] == formula.world:
                 first_new_interpretation.used_relations.append(relation)
@@ -148,7 +148,7 @@ def apply_rule(interpretations):
         elif connective in ['p', 'q', 'r', 's']: # no connective left, add valuations
             #new_interpretation = copy_interpretation(old_interpretation)
             added = old_interpretation.add_valuation(connective, formula.world, formula.assignation)
-            if not added:
+            if added == False:
                 print("contradiction")
                 #old_interpretation.data.open = False
                 return interpretations 
@@ -159,6 +159,7 @@ def apply_rule(interpretations):
             return interpretations
 
     else: # no more formulas, apply transitivity rule, then heredity rule and finally permanent formulas
+        print("transitivity")
         # transitivity rule
         for first_relation in old_interpretation.relations:
             first = first_relation[1]
@@ -178,9 +179,10 @@ def apply_rule(interpretations):
         
         # try to find contradiction
         for variable, world in zip(variables, worlds):
-            contradiction = old_interpretation.add_valuation(variable, world, True)
-            if contradiction:
-                old_interpretation.open = False
+            added = old_interpretation.add_valuation(variable, world, True)
+            if added == False:
+                print("contradiction 2")
+                #old_interpretation.open = False
                 return interpretations
         
         # apply rule again to permanent formulas
