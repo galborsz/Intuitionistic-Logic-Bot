@@ -5,7 +5,6 @@ class TreeNode:
         self.left = None
         self.right = None
         self.parent = None
-        self.open = True
 
     def inorder(self):
         if self.left:
@@ -13,6 +12,14 @@ class TreeNode:
         print(self.data)
         if self.right:
             self.right.inorder()
+    
+    def traverse_tableau(self):
+        print("Tableau node ", self.data.number, ": ")
+        print(self.data.worlds)
+        if self.left:
+            self.left.traverse_tableau()
+        if self.right:
+            self.right.traverse_tableau()
 
     def preorder(self):
         print(self.data)

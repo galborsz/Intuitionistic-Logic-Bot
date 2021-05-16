@@ -37,14 +37,12 @@ def build_tree(formula):
         if q < len(formula):
             element = formula[q]
             if element in (connectives + variables):
-                #print("element: ", element)
                 if element == '∼':
                     count = 1
                     while element == '∼':
                         if formula[q+1] == "(":
                             for i in range(count):
                                 stack.append('∼')
-                            #break
                         elif formula[q+1] in variables:
                             negation = TreeNode("∼")
                             original = negation
@@ -53,7 +51,6 @@ def build_tree(formula):
                                 negation = negation.right
                             negation.add_child_right(TreeNode(formula[q+1]))
                             stack.append(original)
-                            #break
                         elif formula[q+1] == "∼":
                             count+=1  
                         q+=1   
