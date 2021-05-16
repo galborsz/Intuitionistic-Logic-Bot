@@ -67,7 +67,7 @@ def no_more_formulas(old_interpretation, interpretations):
         worlds = []
         for valuation in old_interpretation.valuations:
             for relation in old_interpretation.relations:
-                if valuation[1] == relation[0] and relation[0] != relation[1]:
+                if valuation[1] == relation[0] and relation[0] != relation[1]and old_interpretation.valuations[valuation] == True:
                     variables.append(valuation[0])
                     worlds.append(relation[1])
         
@@ -169,8 +169,6 @@ def apply_rule(interpretations):
     else: # no more formulas, apply transitivity rule, then heredity rule and finally permanent formulas
         return no_more_formulas(old_interpretation, interpretations)
         
-
-
 def decision_procedure(tree):
     interpretations = []
     initial_node = create_initial_tableau_node(tree)

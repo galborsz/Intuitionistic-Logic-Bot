@@ -12,21 +12,6 @@ class TreeNode:
         print(self.data)
         if self.right:
             self.right.inorder()
-    
-    def traverse_tableau(self):
-        print("Tableau node ", self.data.number, ": ")
-        print(self.data.worlds)
-        if self.left:
-            self.left.traverse_tableau()
-        if self.right:
-            self.right.traverse_tableau()
-
-    def preorder(self):
-        print(self.data)
-        if self.left:
-            self.left.preorder()
-        if self.right:
-            self.right.preorder()
 
     def tree_to_string(self):
         node = self.inorder()
