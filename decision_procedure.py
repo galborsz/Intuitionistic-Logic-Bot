@@ -78,9 +78,15 @@ def no_more_formulas(old_interpretation, interpretations):
         if added == False:
             return interpretations
     
+
     # apply rule again to permanent formulas (only if there are relations that have not been applied yet)
-    if operator.eq(set(old_interpretation.relations),set(old_interpretation.used_relations)):
-        for formula in old_interpretation.permanent_formulas:
+    #if not operator.eq(set(old_interpretation.relations),set(old_interpretation.used_relations)):
+    for formula in old_interpretation.permanent_formulas:
+        possible_relations = []
+        for relation in old_interpretation.relations:
+            if relation[0] == formula.world:
+                possible_relations.append(relation)
+        if not operator.eq(set(possible_relations),set(old_interpretation.used_relations)):
             return rules(old_interpretation, formula, formula.tree.data, interpretations)
     
     return False # no contradiction found, so it is not a tautology
