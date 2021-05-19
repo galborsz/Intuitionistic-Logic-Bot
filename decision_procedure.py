@@ -1,4 +1,5 @@
 from tree_node import TreeNode
+import operator
 
 class Formula:
     def __init__(self, tree, world, assignation):
@@ -55,33 +56,34 @@ def copy_interpretation(old_interpretation):
 
 def no_more_formulas(old_interpretation, interpretations):
     # transitivity rule
-        for first_relation in old_interpretation.relations:
-            first = first_relation[1]
-            for second_relation in old_interpretation.relations:
-                if first == second_relation[0]:
-                    old_interpretation.add_relation(first_relation[0], second_relation[1])
-                    first = second_relation[1]
+    for first_relation in old_interpretation.relations:
+        first = first_relation[1]
+        for second_relation in old_interpretation.relations:
+            if first == second_relation[0]:
+                old_interpretation.add_relation(first_relation[0], second_relation[1])
+                first = second_relation[1]
 
-        # heredity rule
-        variables = []
-        worlds = []
-        for valuation in old_interpretation.valuations:
-            for relation in old_interpretation.relations:
-                if valuation[1] == relation[0] and relation[0] != relation[1]and old_interpretation.valuations[valuation] == True:
-                    variables.append(valuation[0])
-                    worlds.append(relation[1])
-        
-        # try to find contradiction
-        for variable, world in zip(variables, worlds):
-            added = old_interpretation.add_valuation(variable, world, True)
-            if added == False:
-                return interpretations
-        
-        # apply rule again to permanent formulas
+    # heredity rule
+    variables = []
+    worlds = []
+    for valuation in old_interpretation.valuations:
+        for relation in old_interpretation.relations:
+            if valuation[1] == relation[0] and relation[0] != relation[1]and old_interpretation.valuations[valuation] == True:
+                variables.append(valuation[0])
+                worlds.append(relation[1])
+    
+    # try to find contradiction
+    for variable, world in zip(variables, worlds):
+        added = old_interpretation.add_valuation(variable, world, True)
+        if added == False:
+            return interpretations
+    
+    # apply rule again to permanent formulas (only if there are relations that have not been applied yet)
+    if operator.eq(set(old_interpretation.relations),set(old_interpretation.used_relations)):
         for formula in old_interpretation.permanent_formulas:
             return rules(old_interpretation, formula, formula.tree.data, interpretations)
-        
-        return False # no contradiction found, so it is not a tautology
+    
+    return False # no contradiction found, so it is not a tautology
 
 def rules(old_interpretation, formula, connective, interpretations):
     if connective == '⊐' and formula.assignation == False:
@@ -93,11 +95,11 @@ def rules(old_interpretation, formula, connective, interpretations):
         return interpretations
          
     elif connective == '⊐' and formula.assignation == True:
-        old_interpretation.add_permanent_formula(formula)
         new_interpretation = copy_interpretation(old_interpretation)
         new_interpretation.add_permanent_formula(formula)
+        old_interpretation.add_permanent_formula(formula)
         for relation in old_interpretation.relations:
-            if relation[0] == formula.world:
+            if relation[0] == formula.world and relation not in old_interpretation.used_relations:
                 old_interpretation.used_relations.append(relation)
                 new_interpretation.used_relations.append(relation)
                 old_interpretation.add_removable_formula(Formula(formula.tree.left, relation[1], False))
@@ -109,7 +111,7 @@ def rules(old_interpretation, formula, connective, interpretations):
     elif connective == '∼' and formula.assignation == True: 
         old_interpretation.add_permanent_formula(formula)
         for relation in old_interpretation.relations:
-            if relation[0] == formula.world:
+            if relation[0] == formula.world and relation not in old_interpretation.used_relations:
                 old_interpretation.used_relations.append(relation)
                 old_interpretation.add_removable_formula(Formula(formula.tree.right, relation[1], False))
         interpretations.append(old_interpretation)
@@ -129,16 +131,16 @@ def rules(old_interpretation, formula, connective, interpretations):
         return interpretations
 
     elif connective == '∧' and formula.assignation == False:
-        old_interpretation.add_removable_formula(Formula(formula.tree.left, formula.world, False))
         new_interpretation = copy_interpretation(old_interpretation)
+        old_interpretation.add_removable_formula(Formula(formula.tree.left, formula.world, False))
         new_interpretation.add_removable_formula(Formula(formula.tree.right, formula.world, False))
         interpretations.append(old_interpretation)
         interpretations.append(new_interpretation)
         return interpretations
 
     elif connective == '∨' and formula.assignation == True:
-        old_interpretation.add_removable_formula(Formula(formula.tree.left, formula.world, True))
         new_interpretation = copy_interpretation(old_interpretation)
+        old_interpretation.add_removable_formula(Formula(formula.tree.left, formula.world, True))
         new_interpretation.add_removable_formula(Formula(formula.tree.right, formula.world, True))
         interpretations.append(old_interpretation)
         interpretations.append(new_interpretation)

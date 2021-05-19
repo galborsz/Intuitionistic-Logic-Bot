@@ -11,7 +11,8 @@ def main():
     #formula = "∼∼(p∨∼p)" # tautology - correct
     #formula = "p∧∼p" # not a tautology - correct
     #formula = "p⊐q" # not a tautology - correct
-    formula = "(p⊐q)⊐(∼q⊐∼p)" # tautology - correct
+    #formula = "(p⊐q)⊐(∼q⊐∼p)" # tautology - correct
+    formula = "∼p⊐p" # not a tautology - correct
     print("Given formula: ", formula)
     
     # convert formula to tree
