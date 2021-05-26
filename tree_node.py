@@ -28,3 +28,17 @@ class TreeNode:
         if right != None: 
             right.parent = self
         self.right = right
+
+def tree_formula(data, left, right):
+    tree = TreeNode(data)
+    if left != None:
+        if isinstance(left, str):
+            tree.add_child_left(TreeNode(left))
+        else:
+            tree.add_child_left(left)
+    if right != None:
+        if isinstance(right, str):
+            tree.add_child_right(TreeNode(right))
+        else:
+            tree.add_child_right(right)
+    return tree
