@@ -9,7 +9,7 @@ class TreeNode:
     def inorder(self):
         if self.left:
             self.left.inorder()
-        print(self.data)
+        print(self.data, end = '')
         if self.right:
             self.right.inorder()
 

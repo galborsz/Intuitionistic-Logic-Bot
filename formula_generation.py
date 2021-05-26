@@ -73,19 +73,20 @@ def add_implication(tree1, tree2):
     tree.add_child_right(tree2)
     return tree
 
-def pattern_rules(recursive_level):
+def pattern_rules(level):
     file_to_read = open("stored_object.pickle", "rb")
     loaded_object = pickle.load(file_to_read)
-    previous_recursive_level = loaded_object[recursive_level.level - 1]
+    previous_recursive_level = loaded_object[level - 1]
+    list_objects = []
+    current_recursive_level = RecursiveLevel(level)
     
     # ∼Rn
     for key in list(previous_recursive_level.formulas.keys()):
         list_formulas = previous_recursive_level.formulas[key]
         for formula in list_formulas:
             new_formula = add_negation(formula.formula)
-            new_formula.inorder()
-            new_formula = FormulaStructure(formula.characters, new_formula)
-            recursive_level.add_formula(1, new_formula)
+            new_formula_structure = FormulaStructure(formula.characters + 1, new_formula)
+            current_recursive_level.add_formula(key, new_formula_structure)
     
     # Rn * Rn
     for key1 in list(previous_recursive_level.formulas.keys()):
@@ -94,56 +95,74 @@ def pattern_rules(recursive_level):
             for key2 in list(previous_recursive_level.formulas.keys()):
                 list_formulas2 = previous_recursive_level.formulas[key2]
                 for formula2 in list_formulas2:
-                    new_formula = add_implication(formula1, formula2)
-                    recursive_level.add_formula(2, new_formula)
-                    new_formula = add_conjunction(formula1, formula2)
-                    recursive_level.add_formula(2, new_formula)
-                    new_formula = add_disjunction(formula1, formula2)
-                    recursive_level.add_formula(2, new_formula)
+                    new_formula = add_implication(formula1.formula, formula2.formula)
+                    new_formula_structure = FormulaStructure(formula1.characters + formula2.characters + 1, new_formula)
+                    current_recursive_level.add_formula(key1 + key2, new_formula_structure)
+                    new_formula = add_conjunction(formula1.formula, formula2.formula)
+                    new_formula_structure = FormulaStructure(formula1.characters + formula2.characters + 1, new_formula)
+                    current_recursive_level.add_formula(key1 + key2, new_formula_structure)
+                    new_formula = add_disjunction(formula1.formula, formula2.formula)
+                    new_formula_structure = FormulaStructure(formula1.characters + formula2.characters + 1, new_formula)
+                    current_recursive_level.add_formula(key1 + key2, new_formula_structure)
                     
 
     # Rn * Rn0->Rn-1 and Rn0->Rn-1 * Rn
-    for level1 in loaded_object:
-        for level2 in loaded_object:
-             for key1 in list(level1.formulas.keys()):
-                list_formulas1 = level1.formulas[key1]
-                for formula1 in list_formulas1:
-                    for key2 in list(level2.formulas.keys()):
-                        list_formulas2 = level2.formulas[key2]
-                        for formula2 in list_formulas2:
-                            new_formula = add_implication(formula1, formula2)
-                            recursive_level.add_formula(2, new_formula)
-                            new_formula = add_conjunction(formula1, formula2)
-                            recursive_level.add_formula(2, new_formula)
-                            new_formula = add_disjunction(formula1, formula2)
-                            recursive_level.add_formula(2, new_formula)
+    for level in loaded_object[:-1]:
+        list_objects.append(level)
+        for key1 in list(previous_recursive_level.formulas.keys()):
+            list_formulas1 = previous_recursive_level.formulas[key1]
+            for formula1 in list_formulas1:
+                for key2 in list(level.formulas.keys()):
+                    list_formulas2 = level.formulas[key2]
+                    for formula2 in list_formulas2:
+                        new_formula = add_implication(formula1.formula, formula2.formula)
+                        new_formula_structure = FormulaStructure(formula1.characters + formula2.characters + 1, new_formula)
+                        current_recursive_level.add_formula(key1 + key2, new_formula_structure)
 
+                        new_formula = add_implication(formula2.formula, formula1.formula)
+                        new_formula_structure = FormulaStructure(formula1.characters + formula2.characters + 1, new_formula)
+                        current_recursive_level.add_formula(key1 + key2, new_formula_structure)
+
+                        new_formula = add_conjunction(formula1.formula, formula2.formula)
+                        new_formula_structure = FormulaStructure(formula1.characters + formula2.characters + 1, new_formula)
+                        current_recursive_level.add_formula(key1 + key2, new_formula_structure)
+
+                        new_formula = add_conjunction(formula2.formula, formula1.formula)
+                        new_formula_structure = FormulaStructure(formula1.characters + formula2.characters + 1, new_formula)
+                        current_recursive_level.add_formula(key1 + key2, new_formula_structure)
+
+                        new_formula = add_disjunction(formula1.formula, formula2.formula)
+                        new_formula_structure = FormulaStructure(formula1.characters + formula2.characters + 1, new_formula)
+                        current_recursive_level.add_formula(key1 + key2, new_formula_structure)
+
+                        new_formula = add_disjunction(formula2.formula, formula1.formula)
+                        new_formula_structure = FormulaStructure(formula1.characters + formula2.characters + 1, new_formula)
+                        current_recursive_level.add_formula(key1 + key2, new_formula_structure)
+    list_objects.append(previous_recursive_level)
     file_to_read.close()
-    return recursive_level
+
+    list_objects.append(current_recursive_level)
+    file_to_store = open("stored_object.pickle", "wb")
+    pickle.dump(list_objects, file_to_store)
+    file_to_store.close()
 
 def formula_generator():
     generate_initial_level()
+    level = 2
+
+    while level < 4:
+        pattern_rules(level)
+        level += 1
+
+    file_to_read = open("stored_object.pickle", "rb")
+    loaded_object = pickle.load(file_to_read)
+    for level in loaded_object:
+        print("Level: ", level.level)
+        for key in list(level.formulas.keys()):
+            print("Variables: ", key)
+            list_formulas = level.formulas[key]
+            for formula in list_formulas:
+                formula.formula.inorder()
+                print("\n")
     
-    recursive_level = RecursiveLevel(2)
-    recursive_level = pattern_rules(recursive_level)
-    
-    #file_to_store = open("stored_object.pickle", "wb")
-    #pickle.dump(recursive_level, file_to_store)
-    #file_to_store.close()
-
-"""
-level = 2
-
-while True:
-    print("Generating formulas...")
-    recursive_level = RecursiveLevel(level)
-
-    # generate formula structures
-    recursive_level = pattern_rules(recursive_level, file_to_store)
-
-    # store recursive level
-    pickle.dumps(recursive_level, file_to_store)
-
-    # increase recursive level
-    level += 1
-"""
+    file_to_read.close()
