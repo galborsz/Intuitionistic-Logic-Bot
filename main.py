@@ -1,5 +1,6 @@
 from formula_tree import build_tree
 from decision_procedure import decision_procedure
+from formula_generation import formula_generator
 
 def main():
     #formula = "q⊐(p⊐q)" # tautology - correct
@@ -29,6 +30,9 @@ def main():
         print(formula, " is a tautology")
     else:
         print(formula, " is not a tautology")
+
+    formula_generator()
+    
 
 if __name__ == '__main__':
     main()
