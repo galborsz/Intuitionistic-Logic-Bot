@@ -1,10 +1,9 @@
 
 import string
-from tree_node import TreeNode
-from formula_tree import build_tree
 from decision_procedure import decision_procedure
 
-
+# global variable
+alphabet = list(string.ascii_lowercase)
 
 def traversal_replace(var, formula):
     if formula.data == "*":
@@ -21,21 +20,17 @@ def traversal_replace(var, formula):
         if assigned:
             return True
     
-    return False
-
-    
+    return False  
 
 def variables_substitution(var_num, formula, maxim, level):
+    #print("\nformula: \n")
+    #formula.inorder()
+    #print("\n")
     if level == var_num + 1:
         if decision_procedure(formula):
             formula.inorder()
             print(" is a tautology")
-        else:
-            formula.inorder()
-            print(" is not a tautology")
         return
-
-    alphabet = list(string.ascii_lowercase)
     
     for i in range(maxim):
         if i == maxim - 1:
@@ -45,22 +40,3 @@ def variables_substitution(var_num, formula, maxim, level):
             new_formula = formula.copy()
         traversal_replace(alphabet[i], new_formula)
         variables_substitution(var_num, new_formula, maxim, level+1)    
-
-def main():
-    root = TreeNode("⊐")
-    left = TreeNode("⊐")
-    left.add_child_left(TreeNode("*"))
-    left.add_child_right(TreeNode("*"))
-
-    right = TreeNode("⊐")
-    right.add_child_left(TreeNode("*"))
-    right.add_child_right(TreeNode("*"))
-
-    root.add_child_left(left)
-    root.add_child_right(right)
-    root.inorder()
-    print("\n")
-    variables_substitution(4, root, 1, 1)
-
-if __name__ == '__main__':
-    main()

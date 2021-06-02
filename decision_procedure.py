@@ -1,5 +1,9 @@
 from tree_node import TreeNode
-import operator
+import operator, string
+
+# global variable
+alphabet = list(string.ascii_lowercase)
+connectives = ['⊐', '∧', '∨', '∼']
 
 class Formula:
     def __init__(self, tree, world, assignation):
@@ -164,20 +168,25 @@ def apply_rule(interpretations):
         formula = old_interpretation.removable_formulas.pop(0)
         connective = formula.tree.data
 
-        if connective in ['⊐', '∧', '∨', '∼']:
+        if connective in connectives:
             return rules(old_interpretation, formula, connective, interpretations)
     
-        elif connective in ['p', 'q', 'r', 's']: # no connective left, add valuations
+        elif connective in alphabet: # no connective left, add valuations
             added = old_interpretation.add_valuation(connective, formula.world, formula.assignation)
             if added == False:
                 return interpretations 
             interpretations.append(old_interpretation)
             return interpretations
+        else:
+            print("wrong notation")
+            return False
 
     else: # no more formulas, apply transitivity rule, then heredity rule and finally permanent formulas
         return no_more_formulas(old_interpretation, interpretations)
         
 def decision_procedure(tree):
+    #print("\nprocessing: ")
+    #tree.inorder()
     interpretations = []
     initial_node = create_initial_tableau_node(tree)
     interpretations.append(initial_node)

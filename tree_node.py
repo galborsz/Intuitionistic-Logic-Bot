@@ -8,10 +8,12 @@ class TreeNode:
 
     def inorder(self):
         if self.left:
+            print("(", end = '')
             self.left.inorder()
         print(self.data, end = '')
         if self.right:
             self.right.inorder()
+            print(")", end = '')
 
     def tree_to_string(self):
         node = self.inorder()

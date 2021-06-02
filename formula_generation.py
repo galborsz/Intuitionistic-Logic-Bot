@@ -1,7 +1,7 @@
 from recursive_levels import RecursiveLevel, FormulaStructure
 from tree_node import TreeNode, tree_formula
+from variables_substitution import variables_substitution
 import pickle
-from decision_procedure import decision_procedure
 
 def generate_initial_level():
     file_to_store = open("stored_object.pickle", "wb")
@@ -16,20 +16,20 @@ def generate_initial_level():
     # recursive level 1
     recursive_level_1 = RecursiveLevel(1)
     formula = FormulaStructure(2, tree_formula("∼", None, "*"))
+    variables_substitution(1, formula.formula.copy(), 1, 1)
     recursive_level_1.add_formula(1, formula)
-    #variables_substitution(formula)
-
+    
     formula = FormulaStructure(3, tree_formula("⊐", "*", "*"))
+    variables_substitution(2, formula.formula.copy(), 1, 1)
     recursive_level_1.add_formula(2, formula)
-    #variables_substitution(formula)
 
     formula = FormulaStructure(3, tree_formula("∧", "*", "*"))
+    variables_substitution(2, formula.formula.copy(), 1, 1)
     recursive_level_1.add_formula(2, formula)
-    #variables_substitution(formula)
 
     formula = FormulaStructure(3, tree_formula("∨", "*", "*"))
+    variables_substitution(2, formula.formula.copy(), 1, 1)
     recursive_level_1.add_formula(2, formula)
-    #variables_substitution(formula)
     
     list_objects.append(recursive_level_1)
     pickle.dump(list_objects, file_to_store)
@@ -47,7 +47,11 @@ def pattern_rules(level):
         list_formulas = previous_recursive_level.formulas[key]
         for formula in list_formulas:
             new_formula = tree_formula("∼", None, formula.formula)
+            print("\nstart\n")
+            new_formula.inorder()
+            print("\nend\n")
             new_formula_structure = FormulaStructure(formula.characters + 1, new_formula)
+            variables_substitution(key, new_formula_structure.formula.copy(), 1, 1)
             current_recursive_level.add_formula(key, new_formula_structure)
     
     # Rn * Rn
@@ -58,15 +62,27 @@ def pattern_rules(level):
                 list_formulas2 = previous_recursive_level.formulas[key2]
                 for formula2 in list_formulas2:
                     new_formula = tree_formula("⊐", formula1.formula, formula2.formula)
+                    print("\nstart\n")
+                    new_formula.inorder()
+                    print("\nend\n")
                     new_formula_structure = FormulaStructure(formula1.characters + formula2.characters + 1, new_formula)
+                    variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1)
                     current_recursive_level.add_formula(key1 + key2, new_formula_structure)
                     
                     new_formula = tree_formula("∧", formula1.formula, formula2.formula)
+                    print("\nstart\n")
+                    new_formula.inorder()
+                    print("\nend\n")
                     new_formula_structure = FormulaStructure(formula1.characters + formula2.characters + 1, new_formula)
+                    variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1)
                     current_recursive_level.add_formula(key1 + key2, new_formula_structure)
                     
                     new_formula = tree_formula("∨", formula1.formula, formula2.formula)
+                    print("\nstart\n")
+                    new_formula.inorder()
+                    print("\nend\n")
                     new_formula_structure = FormulaStructure(formula1.characters + formula2.characters + 1, new_formula)
+                    variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1)
                     current_recursive_level.add_formula(key1 + key2, new_formula_structure)
                     
 
@@ -80,27 +96,51 @@ def pattern_rules(level):
                     list_formulas2 = level.formulas[key2]
                     for formula2 in list_formulas2:
                         new_formula = tree_formula("⊐", formula1.formula, formula2.formula)
+                        print("\nstart\n")
+                        new_formula.inorder()
+                        print("\nend\n")
                         new_formula_structure = FormulaStructure(formula1.characters + formula2.characters + 1, new_formula)
+                        variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1)
                         current_recursive_level.add_formula(key1 + key2, new_formula_structure)
 
                         new_formula = tree_formula("⊐", formula2.formula, formula1.formula)
+                        print("\nstart\n")
+                        new_formula.inorder()
+                        print("\nend\n")
                         new_formula_structure = FormulaStructure(formula1.characters + formula2.characters + 1, new_formula)
+                        variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1)
                         current_recursive_level.add_formula(key1 + key2, new_formula_structure)
 
                         new_formula = tree_formula("∧", formula1.formula, formula2.formula)
+                        print("\nstart\n")
+                        new_formula.inorder()
+                        print("\nend\n")
                         new_formula_structure = FormulaStructure(formula1.characters + formula2.characters + 1, new_formula)
+                        variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1)
                         current_recursive_level.add_formula(key1 + key2, new_formula_structure)
 
                         new_formula = tree_formula("∧", formula2.formula, formula1.formula)
+                        print("\nstart\n")
+                        new_formula.inorder()
+                        print("\nend\n")
                         new_formula_structure = FormulaStructure(formula1.characters + formula2.characters + 1, new_formula)
+                        variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1)
                         current_recursive_level.add_formula(key1 + key2, new_formula_structure)
 
                         new_formula = tree_formula("∨", formula1.formula, formula2.formula)
+                        print("\nstart\n")
+                        new_formula.inorder()
+                        print("\nend\n")
                         new_formula_structure = FormulaStructure(formula1.characters + formula2.characters + 1, new_formula)
+                        variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1)
                         current_recursive_level.add_formula(key1 + key2, new_formula_structure)
 
                         new_formula = tree_formula("∨", formula2.formula, formula1.formula)
+                        print("\nstart\n")
+                        new_formula.inorder()
+                        print("\nend\n")
                         new_formula_structure = FormulaStructure(formula1.characters + formula2.characters + 1, new_formula)
+                        variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1)
                         current_recursive_level.add_formula(key1 + key2, new_formula_structure)
     
     list_objects.append(previous_recursive_level)
@@ -118,16 +158,5 @@ def formula_generator():
     while level < 4:
         pattern_rules(level)
         level += 1
-
-    file_to_read = open("stored_object.pickle", "rb")
-    loaded_object = pickle.load(file_to_read)
-    for level in loaded_object:
-        print("Level: ", level.level)
-        for key in list(level.formulas.keys()):
-            print("Variables: ", key)
-            list_formulas = level.formulas[key]
-            for formula in list_formulas:
-                formula.formula.inorder()
-                print("\n")
     
-    file_to_read.close()
+    
