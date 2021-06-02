@@ -1,9 +1,21 @@
 
 import string
 from decision_procedure import decision_procedure
+from tree_node import treeToString
+from keys_format import *
 
-# global variable
+import tweepy
+import time
+# NOTE: I put my keys in the keys.py to separate them
+# from this main file.
+# Please refer to keys_format.py to see the format.
+
+
+# global variables
 alphabet = list(string.ascii_lowercase)
+auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
+api = tweepy.API(auth)
 
 def traversal_replace(var, formula):
     if formula.data == "*":
@@ -23,13 +35,13 @@ def traversal_replace(var, formula):
     return False  
 
 def variables_substitution(var_num, formula, maxim, level):
-    #print("\nformula: \n")
-    #formula.inorder()
-    #print("\n")
     if level == var_num + 1:
         if decision_procedure(formula):
-            formula.inorder()
-            print(" is a tautology")
+            # post in Twitter
+            line = []
+            treeToString(formula, line)
+            api.update_status(''.join(line))
+            time.sleep(60)
         return
     
     for i in range(maxim):

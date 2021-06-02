@@ -52,3 +52,19 @@ def tree_formula(data, left, right):
         else:
             tree.add_child_right(right)
     return tree
+
+# Function to construct string from binary tree
+def treeToString(root, string):
+    
+    if root.left:
+        string.append('(')
+        treeToString(root.left, string)
+
+    # push the root data as character
+    string.append(str(root.data))
+
+    # only if right child is present to
+    # avoid extra parenthesis
+    if root.right:
+        treeToString(root.right, string)
+        string.append(')')

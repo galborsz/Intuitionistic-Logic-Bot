@@ -84,7 +84,6 @@ def no_more_formulas(old_interpretation, interpretations):
     
 
     # apply rule again to permanent formulas (only if there are relations that have not been applied yet)
-    #if not operator.eq(set(old_interpretation.relations),set(old_interpretation.used_relations)):
     for formula in old_interpretation.permanent_formulas:
         possible_relations = []
         for relation in old_interpretation.relations:
@@ -185,8 +184,6 @@ def apply_rule(interpretations):
         return no_more_formulas(old_interpretation, interpretations)
         
 def decision_procedure(tree):
-    #print("\nprocessing: ")
-    #tree.inorder()
     interpretations = []
     initial_node = create_initial_tableau_node(tree)
     interpretations.append(initial_node)

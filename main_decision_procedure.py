@@ -27,7 +27,7 @@ def main():
     #tree = build_tree(formula)
     tree = TreeNode("∼")
     rightfirst = TreeNode("∼")
-    leaf = TreeNode("*")
+    leaf = TreeNode("a")
     rightfirst.add_child_right(leaf)
     rightsecond = TreeNode("∼")
     rightsecond.add_child_right(rightfirst)
