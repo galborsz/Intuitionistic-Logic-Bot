@@ -28,7 +28,7 @@ def get_subtree(stack):
 
 def build_tree(formula):
     # symbols definition
-    variables = ['p', 'q', 'r', 's']
+    variables = ['p', 'q', 'r', 's', '*']
     connectives = ['⊐', '∧', '∨', '∼']
 
     stack = [] # for storing temporal symbols

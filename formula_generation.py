@@ -9,25 +9,25 @@ def generate_initial_level():
 
     # recursive level 0
     recursive_level_0 = RecursiveLevel(0)
-    formula = FormulaStructure(1, TreeNode("x"))
+    formula = FormulaStructure(1, TreeNode("*"))
     recursive_level_0.add_formula(1, formula)
     list_objects.append(recursive_level_0)
 
     # recursive level 1
     recursive_level_1 = RecursiveLevel(1)
-    formula = FormulaStructure(2, tree_formula("∼", None, "x"))
+    formula = FormulaStructure(2, tree_formula("∼", None, "*"))
     recursive_level_1.add_formula(1, formula)
     #variables_substitution(formula)
 
-    formula = FormulaStructure(3, tree_formula("⊐", "x", "x"))
+    formula = FormulaStructure(3, tree_formula("⊐", "*", "*"))
     recursive_level_1.add_formula(2, formula)
     #variables_substitution(formula)
 
-    formula = FormulaStructure(3, tree_formula("∧", "x", "x"))
+    formula = FormulaStructure(3, tree_formula("∧", "*", "*"))
     recursive_level_1.add_formula(2, formula)
     #variables_substitution(formula)
 
-    formula = FormulaStructure(3, tree_formula("∨", "x", "x"))
+    formula = FormulaStructure(3, tree_formula("∨", "*", "*"))
     recursive_level_1.add_formula(2, formula)
     #variables_substitution(formula)
     

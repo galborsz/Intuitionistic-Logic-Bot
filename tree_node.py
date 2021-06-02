@@ -28,6 +28,14 @@ class TreeNode:
         if right != None: 
             right.parent = self
         self.right = right
+    
+    def copy(self):
+        copy_tree = TreeNode(self.data)
+        if self.left is not None:
+            copy_tree.left = self.left.copy()
+        if self.right is not None:
+            copy_tree.right = self.right.copy()
+        return copy_tree
 
 def tree_formula(data, left, right):
     tree = TreeNode(data)
