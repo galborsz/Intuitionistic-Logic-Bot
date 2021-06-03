@@ -10,6 +10,8 @@ class TreeNode:
         if self.left:
             print("(", end = '')
             self.left.inorder()
+        elif self.data == "∼": 
+            print("(", end = '')
         print(self.data, end = '')
         if self.right:
             self.right.inorder()
@@ -59,7 +61,8 @@ def treeToString(root, string):
     if root.left:
         string.append('(')
         treeToString(root.left, string)
-
+    elif root.data == "∼": 
+        string.append('(')
     # push the root data as character
     string.append(str(root.data))
 

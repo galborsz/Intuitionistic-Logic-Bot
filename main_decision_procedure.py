@@ -20,18 +20,19 @@ def main():
     #formula = "∼p∨∼p" # not a tautology - correct
     #formula = "∼p⊐q" # not a tautology - correct
     #formula = "(q∧p)⊐p" # tautology - correct
-    formula = "∼∼∼*"
+    #formula = "∼∼∼p" # not a tautology - correct
+    #formula = "(∼((∼a)⊐(∼b)))"
+    #formula = "(∼(a⊐(a∨a)))" # not a tautology - correct
+    #formula = "((∼(∼a))⊐(∼(∼a)))"
+    #formula = "(a⊐(a∨a))" # tautology - correct
+    #formula = "((∼(a∧b))⊐(∼(a∧a)))" # not a tautology
+    #formula = "((∼(∼a))∧((a∨a)⊐(b⊐b)))" # not a tautology
+    formula = "(((a∨b)∨(∼a))⊐((a⊐a)⊐(c⊐c)))" # tautology - correct
     print("Given formula: ", formula)
     
     # convert formula to tree
-    #tree = build_tree(formula)
-    tree = TreeNode("∼")
-    rightfirst = TreeNode("∼")
-    leaf = TreeNode("a")
-    rightfirst.add_child_right(leaf)
-    rightsecond = TreeNode("∼")
-    rightsecond.add_child_right(rightfirst)
-    tree.add_child_right(rightsecond)
+
+    tree = build_tree(formula)
 
     # apply tableau method to tree formula
     if decision_procedure(tree):
