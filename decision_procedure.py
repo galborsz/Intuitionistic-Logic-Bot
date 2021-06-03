@@ -1,7 +1,7 @@
 from tree_node import TreeNode
-import operator, string
+import string
 
-# global variable
+# global variables
 alphabet = list(string.ascii_lowercase)
 connectives = ['⊐', '∧', '∨', '∼']
 
@@ -19,6 +19,7 @@ class Interpretation:
         self.relations = set()
         self.valuations = {}
         self.used_relations = set()
+        self.world_generator_present = False
 
     def add_removable_formula(self, formula):
         if formula not in self.removable_formulas:
@@ -71,11 +72,13 @@ def copy_interpretation(old_interpretation):
     new_interpretation.relations = old_interpretation.relations.copy()
     new_interpretation.used_relations = old_interpretation.used_relations.copy()
     new_interpretation.worlds = old_interpretation.worlds
+    new_interpretation.world_generator_present = old_interpretation.world_generator_present
     new_interpretation.valuations = old_interpretation.valuations.copy()
     return new_interpretation
 
 def rules(old_interpretation, formula, connective, interpretations):
     if connective == '⊐' and formula.assignation == False:
+        old_interpretation.world_generator_present = True
         old_interpretation.add_removable_formula(Formula(formula.tree.left, old_interpretation.worlds + 1, True))
         old_interpretation.add_removable_formula(Formula(formula.tree.right, old_interpretation.worlds + 1, False))
         #print("new relation: ", formula.world, old_interpretation.worlds + 1)
@@ -134,6 +137,7 @@ def rules(old_interpretation, formula, connective, interpretations):
         return interpretations
 
     elif connective == '∼' and formula.assignation == False:
+        old_interpretation.world_generator_present = True
         old_interpretation.add_removable_formula(Formula(formula.tree.right, old_interpretation.worlds + 1, True))
         old_interpretation.add_relation(formula.world, old_interpretation.worlds + 1)
         old_interpretation.add_world() # make sure this is correct
@@ -207,6 +211,10 @@ def no_more_formulas(old_interpretation, interpretations):
     # apply rule again to permanent formulas (only if there are relations that have not been applied yet)
     for formula in old_interpretation.permanent_formulas:
         #formula.tree.inorder()
+        if old_interpretation.world_generator_present:
+            print("infinite")
+            return False # infinite branch, not a tautology
+        """
         if formula.tree.right and (formula.tree.right.data  == "∼" or formula.tree.right.data  == "⊐"):
             if decision_procedure(formula.tree.right) == False: # to check that the implication is not a tautology
                 #print("infinite")
@@ -215,6 +223,7 @@ def no_more_formulas(old_interpretation, interpretations):
             if decision_procedure(formula.tree.left) == False: # to check that the implication is not a tautology
                 #print("infinite")
                 return False # infinite branch, not a tautology
+        """
             
         #print("permanent")
         possible_relations = set()

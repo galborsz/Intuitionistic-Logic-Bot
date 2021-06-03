@@ -1,7 +1,7 @@
 from tree_node import TreeNode
 from formula_tree import build_tree
 from decision_procedure import decision_procedure
-from formula_generation import formula_generator
+from tree_node import treeToString
 
 def main():
     #formula = "q⊐(p⊐q)" # tautology - correct
@@ -25,12 +25,14 @@ def main():
     #formula = "∼((a⊐b)⊐a)" # not a tautology - correct
     #formula = "(∼((∼a)⊐(∼b)))"
     #formula = "(∼(a⊐(a∨a)))" # not a tautology - correct
-    #formula = "((∼(∼a))⊐(∼(∼a)))" # not a tautology - correct - infinite
+    formula = "((∼(∼a))⊐(∼(∼a)))" # not a tautology - correct - infinite
     #formula = "(a⊐(a∨a))" # tautology - correct
     #formula = "((∼(a∧b))⊐(∼(a∧a)))" # not a tautology
     #formula = "((∼(∼a))∧((a∨a)⊐(b⊐b)))" # not a tautology
     #formula = "(((a∨b)∨(∼a))⊐((a⊐a)⊐(c⊐c)))" # tautology - correct
-    formula = "(((a∨b)∨(∼a))⊐((a⊐b)⊐(c⊐d)))"
+    #formula = "(((a∨b)∨(∼a))⊐((a⊐b)⊐(c⊐d)))"
+    #formula = "(∼(∼((∼a)∧(∼a))))" # not a tautology - correct
+    #formula = "(∼(∼((∼a)∧(∼a))))" # not working
     #formula = "(∼(∼a))" # not a tautology - correct
     #formula = "(∼(∼(a⊐b)))"
     #formula = "(∼((a⊐a)⊐a))" 
@@ -41,6 +43,9 @@ def main():
     # convert formula to tree
 
     tree = build_tree(formula)
+    line = []
+    treeToString(tree, line)
+    print("tautology: ", ''.join(line))
 
     # apply tableau method to tree formula
     if decision_procedure(tree):
