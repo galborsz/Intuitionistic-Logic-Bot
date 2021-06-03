@@ -78,6 +78,7 @@ def rules(old_interpretation, formula, connective, interpretations):
     if connective == '⊐' and formula.assignation == False:
         old_interpretation.add_removable_formula(Formula(formula.tree.left, old_interpretation.worlds + 1, True))
         old_interpretation.add_removable_formula(Formula(formula.tree.right, old_interpretation.worlds + 1, False))
+        #print("new relation: ", formula.world, old_interpretation.worlds + 1)
         old_interpretation.add_relation(formula.world, old_interpretation.worlds + 1)
         old_interpretation.add_world()
         interpretations.append(old_interpretation)
@@ -89,6 +90,7 @@ def rules(old_interpretation, formula, connective, interpretations):
 
         possible_relations = set()
         for relation in old_interpretation.relations:
+            #print("relation here: ", relation[0], relation[1])
             if relation not in old_interpretation.used_relations:
                 if relation[0] == formula.world:
                     #print("relation added: ", relation[0], relation[1])
@@ -117,7 +119,7 @@ def rules(old_interpretation, formula, connective, interpretations):
         for relation in old_interpretation.relations:
             if relation not in old_interpretation.used_relations:
                 if relation[0] == formula.world:
-                    #print("relation added: ", relation[0], relation[1])
+                    #print("here relation added: ", relation[0], relation[1])
                     possible_relations.add(relation)
         
         if not possible_relations:
@@ -198,12 +200,22 @@ def no_more_formulas(old_interpretation, interpretations):
             return interpretations # the branch is closed, so we can get rid of it
     
     #print("worlds: ", old_interpretation.worlds) 
-    if old_interpretation.worlds > 30:
+    #if old_interpretation.worlds > 30:
         #print("infinite")
-        return False # infinite branch, not a tautology
+        #return False 
 
     # apply rule again to permanent formulas (only if there are relations that have not been applied yet)
     for formula in old_interpretation.permanent_formulas:
+        #formula.tree.inorder()
+        if formula.tree.right and (formula.tree.right.data  == "∼" or formula.tree.right.data  == "⊐"):
+            if decision_procedure(formula.tree.right) == False: # to check that the implication is not a tautology
+                #print("infinite")
+                return False # infinite branch, not a tautology
+        elif formula.tree.left and (formula.tree.left.data == "⊐" or formula.tree.left.data  == "∼"):
+            if decision_procedure(formula.tree.left) == False: # to check that the implication is not a tautology
+                #print("infinite")
+                return False # infinite branch, not a tautology
+            
         #print("permanent")
         possible_relations = set()
         for relation in old_interpretation.relations:
@@ -254,6 +266,7 @@ def decision_procedure(tree):
     while interpretations:
         interpretations = apply_rule(interpretations)
         if interpretations == False: # process should stop because the branch is open
+            #print("end")
             return False # it is not a tautology
         elif not interpretations:
             return True # it is a tautology

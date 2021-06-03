@@ -31,10 +31,10 @@ def traversal_replace(var, formula):
 
 def variables_substitution(var_num, formula, maxim, level, characters):
     if level == var_num + 1:
-        #print("formula: ")
-        #formula.inorder()
-        #print("\n")
-        if decision_procedure(formula) and characters <= 240:
+        print("formula: ")
+        formula.inorder()
+        print("\n")
+        if characters <= 240 and decision_procedure(formula):
             # post in Twitter
             line = []
             treeToString(formula, line)
