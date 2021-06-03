@@ -29,12 +29,26 @@ def traversal_replace(var, formula):
     
     return False  
 
-def variables_substitution(var_num, formula, maxim, level, characters):
+def variables_substitution(var_num, formula, maxim, level, characters, total_tautologies, total_formulas, rec_level):
+    
     if level == var_num + 1:
+        print("rec level: ", rec_level)
         print("formula: ")
         formula.inorder()
         print("\n")
+        if rec_level in total_formulas:
+            total_formulas[rec_level] += 1
+        else:
+            if rec_level > 1:
+                print("RECURSIVE LEVEL: ", rec_level-1)
+                print("TOTAL FORMULAS: ", total_formulas[rec_level-1])
+                print("TOTAL TAUTOLOGIES: ", total_tautologies[rec_level-1])
+            total_formulas[rec_level] = 0 # initialize counter
         if characters <= 240 and decision_procedure(formula):
+            if rec_level in total_tautologies:
+                total_tautologies[rec_level] += 1
+            else:
+                total_tautologies[rec_level] = 0 # initialize counter
             # post in Twitter
             line = []
             treeToString(formula, line)
@@ -50,4 +64,4 @@ def variables_substitution(var_num, formula, maxim, level, characters):
         else:
             new_formula = formula.copy()
         traversal_replace(alphabet[i], new_formula)
-        variables_substitution(var_num, new_formula, maxim, level+1, characters)    
+        variables_substitution(var_num, new_formula, maxim, level+1, characters, total_tautologies, total_formulas, rec_level)    
