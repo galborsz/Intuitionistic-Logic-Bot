@@ -19,6 +19,7 @@ class Interpretation:
         self.relations = set()
         self.valuations = {}
         self.used_relations = set()
+        self.tautology_world_generator_present = False
         self.world_generator_present = False
 
     def add_removable_formula(self, formula):
@@ -72,13 +73,23 @@ def copy_interpretation(old_interpretation):
     new_interpretation.relations = old_interpretation.relations.copy()
     new_interpretation.used_relations = old_interpretation.used_relations.copy()
     new_interpretation.worlds = old_interpretation.worlds
+    new_interpretation.tautology_world_generator_present = old_interpretation.tautology_world_generator_present
     new_interpretation.world_generator_present = old_interpretation.world_generator_present
     new_interpretation.valuations = old_interpretation.valuations.copy()
     return new_interpretation
 
 def rules(old_interpretation, formula, connective, interpretations):
     if connective == '⊐' and formula.assignation == False:
-        old_interpretation.world_generator_present = True
+        if old_interpretation.permanent_formulas and decision_procedure(formula.tree) == True: # if world generator is a tautology, there won't be an infinite branch
+            #print("tautological generator found: ")
+            #formula.tree.inorder()
+            #print("\n")
+            old_interpretation.tautology_world_generator_present = True
+        elif old_interpretation.permanent_formulas and decision_procedure(formula.tree) == False:
+            #print("generator found: ")
+            #formula.tree.inorder()
+            #print("\n")
+            old_interpretation.world_generator_present = True
         old_interpretation.add_removable_formula(Formula(formula.tree.left, old_interpretation.worlds + 1, True))
         old_interpretation.add_removable_formula(Formula(formula.tree.right, old_interpretation.worlds + 1, False))
         #print("new relation: ", formula.world, old_interpretation.worlds + 1)
@@ -137,7 +148,16 @@ def rules(old_interpretation, formula, connective, interpretations):
         return interpretations
 
     elif connective == '∼' and formula.assignation == False:
-        old_interpretation.world_generator_present = True
+        if old_interpretation.permanent_formulas and decision_procedure(formula.tree) == True: # if world generator is a tautology, there won't be an infinite branch
+            #print("tautological generator found: ")
+            #formula.tree.inorder()
+            #print("\n")
+            old_interpretation.tautology_world_generator_present = True
+        elif old_interpretation.permanent_formulas and decision_procedure(formula.tree) == False:
+            #print("generator found: ")
+            #formula.tree.inorder()
+            #print("\n")
+            old_interpretation.world_generator_present = True
         old_interpretation.add_removable_formula(Formula(formula.tree.right, old_interpretation.worlds + 1, True))
         old_interpretation.add_relation(formula.world, old_interpretation.worlds + 1)
         old_interpretation.add_world() # make sure this is correct
@@ -210,21 +230,6 @@ def no_more_formulas(old_interpretation, interpretations):
 
     # apply rule again to permanent formulas (only if there are relations that have not been applied yet)
     for formula in old_interpretation.permanent_formulas:
-        #formula.tree.inorder()
-        if old_interpretation.world_generator_present:
-            print("infinite")
-            return False # infinite branch, not a tautology
-        """
-        if formula.tree.right and (formula.tree.right.data  == "∼" or formula.tree.right.data  == "⊐"):
-            if decision_procedure(formula.tree.right) == False: # to check that the implication is not a tautology
-                #print("infinite")
-                return False # infinite branch, not a tautology
-        elif formula.tree.left and (formula.tree.left.data == "⊐" or formula.tree.left.data  == "∼"):
-            if decision_procedure(formula.tree.left) == False: # to check that the implication is not a tautology
-                #print("infinite")
-                return False # infinite branch, not a tautology
-        """
-            
         #print("permanent")
         possible_relations = set()
         for relation in old_interpretation.relations:
@@ -238,6 +243,15 @@ def no_more_formulas(old_interpretation, interpretations):
             #old_interpretation.relations = possible_relations
             #print(interpretations)
             #print("possible")
+            #formula.tree.inorder()
+            if old_interpretation.tautology_world_generator_present:
+                return interpretations # branch closed bc world generator is a tautology
+
+            # if there is no tautological world generator, check whether there are still removable formulas to work with
+            # if it was not infinite, it would have closed already
+            elif not old_interpretation.removable_formulas and old_interpretation.world_generator_present:
+                print("infinite")
+                return False # infinite branch, not a tautology
             return rules(old_interpretation, formula, formula.tree.data, interpretations)
         #else:
             #print("not possible")

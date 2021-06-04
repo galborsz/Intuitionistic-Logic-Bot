@@ -25,7 +25,7 @@ def main():
     #formula = "∼((a⊐b)⊐a)" # not a tautology - correct
     #formula = "(∼((∼a)⊐(∼b)))"
     #formula = "(∼(a⊐(a∨a)))" # not a tautology - correct
-    formula = "((∼(∼a))⊐(∼(∼a)))" # not a tautology - correct - infinite
+    #formula = "((∼(∼a))⊐(∼(∼a)))" # not a tautology - correct - infinite
     #formula = "(a⊐(a∨a))" # tautology - correct
     #formula = "((∼(a∧b))⊐(∼(a∧a)))" # not a tautology
     #formula = "((∼(∼a))∧((a∨a)⊐(b⊐b)))" # not a tautology
@@ -38,6 +38,8 @@ def main():
     #formula = "(∼((a⊐a)⊐a))" 
     #formula = "(((∼a)⊐a)⊐(∼(∼a)))"
     #formula = "((∼a)⊐a)"
+    #formula = "(a∧b)⊐(a∧b)"
+    formula = "a∧(a⊐a)"
     print("Given formula: ", formula)
     
     # convert formula to tree
