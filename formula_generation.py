@@ -122,10 +122,10 @@ def pattern_rules(level, total_tautologies, total_formulas):
     file_to_store.close()
 
 def formula_generator():
-    # dictinoary for storing the total number of tautologies found,
+    # dictinary for storing the total number of tautologies found,
     # where the key is the recursive level, and the value a counter for that level
     total_tautologies = {} 
-    # dictinoary for storing the total number of formulas generated,
+    # dictinary for storing the total number of formulas generated,
     # where the key is the recursive level, and the value a counter for that level
     total_formulas = {}
 
