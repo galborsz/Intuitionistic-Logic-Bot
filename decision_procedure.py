@@ -261,7 +261,7 @@ def no_more_formulas(old_interpretation, interpretations):
     return False # no contradiction found, so it is not a tautology
 
 def apply_rule(interpretations):
-    old_interpretation = interpretations.pop(0)
+    old_interpretation = interpretations.pop()
     if old_interpretation.removable_formulas:
         formula = old_interpretation.removable_formulas.pop(0)
         connective = formula.tree.data
@@ -283,7 +283,7 @@ def apply_rule(interpretations):
         return no_more_formulas(old_interpretation, interpretations)
         
 def decision_procedure(tree):
-    interpretations = []
+    interpretations = [] #stack
     initial_node = create_initial_tableau_node(tree)
     interpretations.append(initial_node)
     while interpretations:

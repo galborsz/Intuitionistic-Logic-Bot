@@ -1,5 +1,5 @@
 
-class RecursiveLevel:
+class ComplexityLevel:
     def __init__(self, level):
         self.level = level
         self.formulas = {} # the key of the dict represents the number of variables in the formula 
@@ -12,7 +12,7 @@ class RecursiveLevel:
             self.formulas[var_num] = []
             self.formulas[var_num].append(formula)
 
-class FormulaStructure:
+class LogicalStructure:
     def __init__(self, characters, formula):
         self.characters = characters # total amount of characters in the formula
         self.formula = formula # tree structure

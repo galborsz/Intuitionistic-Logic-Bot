@@ -29,7 +29,7 @@ def traversal_replace(var, formula):
     
     return False  
 
-def variables_substitution(var_num, formula, maxim, level, characters, total_tautologies, total_formulas, rec_level):
+def variables_substitution(var_num, formula, maximum, level, characters, total_tautologies, total_formulas, rec_level):
     if rec_level not in total_tautologies.keys():
         total_tautologies[rec_level] = 0 # initialize counter
     if rec_level not in total_formulas.keys():
@@ -56,11 +56,13 @@ def variables_substitution(var_num, formula, maxim, level, characters, total_tau
             #time.sleep(60)
         return
     
-    for i in range(maxim):
-        if i == maxim - 1:
-            maxim = maxim + 1
+    for i in range(maximum): 
+        if i == maximum - 1:
+            maximum = maximum + 1
             new_formula = formula
         else:
             new_formula = formula.copy()
+        if i == len(alphabet): # there are no more available characters for representing propositional variables
+            return
         traversal_replace(alphabet[i], new_formula)
-        variables_substitution(var_num, new_formula, maxim, level+1, characters, total_tautologies, total_formulas, rec_level)    
+        variables_substitution(var_num, new_formula, maximum, level+1, characters, total_tautologies, total_formulas, rec_level)    
