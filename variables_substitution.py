@@ -1,10 +1,13 @@
 
 import string
 #import tweepy
-import time
 from decision_procedure import decision_procedure
 from tree_node import treeToString
 from keys_format import *
+#import main
+import time
+import globals 
+
 
 # global variables
 alphabet = list(string.ascii_lowercase)
@@ -40,12 +43,13 @@ def variables_substitution(var_num, formula, maximum, level, characters, total_t
             print("TOTAL TAUTOLOGIES: ", total_tautologies[rec_level-1])
     if level == var_num + 1:
         #print("rec level: ", rec_level)
-        print("formula: ")
-        formula.inorder()
-        print("\n")
+        #print("formula: ")
+        #formula.inorder()
+        #print("\n")
         total_formulas[rec_level] += 1
         
         if characters <= 240 and decision_procedure(formula):
+            print("--- %s seconds ---" % (time.time() - globals.start_time))
             total_tautologies[rec_level] += 1
                 
             # post in Twitter
