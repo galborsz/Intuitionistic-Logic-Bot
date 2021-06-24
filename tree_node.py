@@ -6,23 +6,6 @@ class TreeNode:
         self.right = None
         self.parent = None
 
-    def inorder(self):
-        if self.left:
-            print("(", end = '')
-            self.left.inorder()
-        elif self.data == "∼": 
-            print("(", end = '')
-        print(self.data, end = '')
-        if self.right:
-            self.right.inorder()
-            print(")", end = '')
-
-    def tree_to_string(self):
-        node = self.inorder()
-        while node:
-            node = node + self.inorder()
-        return node
-
     def add_child_left(self, left):
         if left != None:
             left.parent = self
@@ -61,13 +44,11 @@ def treeToString(root, string):
     if root.left:
         string.append('(')
         treeToString(root.left, string)
-    elif root.data == "∼": 
-        string.append('(')
+
     # push the root data as character
     string.append(str(root.data))
 
-    # only if right child is present to
-    # avoid extra parenthesis
     if root.right:
         treeToString(root.right, string)
-        string.append(')')
+        if root.data != "∼": 
+            string.append(')')

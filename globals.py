@@ -1,1 +1,2 @@
 global start_time
+global start_time_generation

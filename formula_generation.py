@@ -2,33 +2,36 @@ from recursive_levels import ComplexityLevel, LogicalStructure
 from tree_node import TreeNode, tree_formula
 from variables_substitution import variables_substitution
 import pickle
+from time import process_time
+import globals
 
-def generate_initial_level(total_tautologies, total_formulas):
+def generate_initial_level():
     file_to_store = open("stored_object.pickle", "wb")
     list_objects = []
 
-    # recursive level 0
+    # initialize recursive level 0
     recursive_level_0 = ComplexityLevel(0)
     formula = LogicalStructure(1, TreeNode("*"))
     recursive_level_0.add_formula(1, formula)
     list_objects.append(recursive_level_0)
 
-    # recursive level 1
+    # initialize recursive level 1
     recursive_level_1 = ComplexityLevel(1)
+    globals.start_time_generation = process_time()
     formula = LogicalStructure(4, tree_formula("∼", None, "*"))
-    variables_substitution(1, formula.formula.copy(), 1, 1, 4, total_tautologies, total_formulas, 1)
+    variables_substitution(1, formula.formula.copy(), 1, 1, 4, 1)
     recursive_level_1.add_formula(1, formula)
     
     formula = LogicalStructure(5, tree_formula("⊐", "*", "*"))
-    variables_substitution(2, formula.formula.copy(), 1, 1, 5, total_tautologies, total_formulas, 1)
+    variables_substitution(2, formula.formula.copy(), 1, 1, 5, 1)
     recursive_level_1.add_formula(2, formula)
 
     formula = LogicalStructure(5, tree_formula("∧", "*", "*"))
-    variables_substitution(2, formula.formula.copy(), 1, 1, 5, total_tautologies, total_formulas, 1)
+    variables_substitution(2, formula.formula.copy(), 1, 1, 5, 1)
     recursive_level_1.add_formula(2, formula)
 
     formula = LogicalStructure(5, tree_formula("∨", "*", "*"))
-    variables_substitution(2, formula.formula.copy(), 1, 1, 5, total_tautologies, total_formulas, 1)
+    variables_substitution(2, formula.formula.copy(), 1, 1, 5, 1)
     recursive_level_1.add_formula(2, formula)
     
     list_objects.append(recursive_level_1)
@@ -41,14 +44,14 @@ def pattern_rules(level, total_tautologies, total_formulas):
     previous_recursive_level = loaded_object[level - 1]
     list_objects = []
     current_recursive_level = ComplexityLevel(level)
-    
+
     # ∼Rn
     for key in list(previous_recursive_level.formulas.keys()):
         list_formulas = previous_recursive_level.formulas[key]
         for formula in list_formulas:
             new_formula = tree_formula("∼", None, formula.formula)
             new_formula_structure = LogicalStructure(formula.characters + 3, new_formula)
-            variables_substitution(key, new_formula_structure.formula.copy(), 1, 1, formula.characters + 3, total_tautologies, total_formulas, level)
+            variables_substitution(key, new_formula_structure.formula.copy(), 1, 1, formula.characters + 3, level)
             current_recursive_level.add_formula(key, new_formula_structure)
     
     # Rn * Rn
@@ -60,17 +63,17 @@ def pattern_rules(level, total_tautologies, total_formulas):
                 for formula2 in list_formulas2:
                     new_formula = tree_formula("⊐", formula1.formula, formula2.formula)
                     new_formula_structure = LogicalStructure(formula1.characters + formula2.characters + 3, new_formula)
-                    variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1, formula1.characters + formula2.characters + 3, total_tautologies, total_formulas, level)
+                    variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1, formula1.characters + formula2.characters + 3, level)
                     current_recursive_level.add_formula(key1 + key2, new_formula_structure)
                     
                     new_formula = tree_formula("∧", formula1.formula, formula2.formula)
                     new_formula_structure = LogicalStructure(formula1.characters + formula2.characters + 3, new_formula)
-                    variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1, formula1.characters + formula2.characters + 3, total_tautologies, total_formulas, level)
+                    variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1, formula1.characters + formula2.characters + 3, level)
                     current_recursive_level.add_formula(key1 + key2, new_formula_structure)
                     
                     new_formula = tree_formula("∨", formula1.formula, formula2.formula)
                     new_formula_structure = LogicalStructure(formula1.characters + formula2.characters + 3, new_formula)
-                    variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1, formula1.characters + formula2.characters + 3, total_tautologies, total_formulas, level)
+                    variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1, formula1.characters + formula2.characters + 3, level)
                     current_recursive_level.add_formula(key1 + key2, new_formula_structure)
                     
 
@@ -85,32 +88,32 @@ def pattern_rules(level, total_tautologies, total_formulas):
                     for formula2 in list_formulas2:
                         new_formula = tree_formula("⊐", formula1.formula, formula2.formula)
                         new_formula_structure = LogicalStructure(formula1.characters + formula2.characters + 3, new_formula)
-                        variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1, formula1.characters + formula2.characters + 3, total_tautologies, total_formulas, level)
+                        variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1, formula1.characters + formula2.characters + 3, level)
                         current_recursive_level.add_formula(key1 + key2, new_formula_structure)
 
                         new_formula = tree_formula("⊐", formula2.formula, formula1.formula)
                         new_formula_structure = LogicalStructure(formula1.characters + formula2.characters + 3, new_formula)
-                        variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1, formula1.characters + formula2.characters + 3, total_tautologies, total_formulas, level)
+                        variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1, formula1.characters + formula2.characters + 3, level)
                         current_recursive_level.add_formula(key1 + key2, new_formula_structure)
-
+                        
                         new_formula = tree_formula("∧", formula1.formula, formula2.formula)
                         new_formula_structure = LogicalStructure(formula1.characters + formula2.characters + 3, new_formula)
-                        variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1, formula1.characters + formula2.characters + 3, total_tautologies, total_formulas, level)
+                        variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1, formula1.characters + formula2.characters + 3, level)
                         current_recursive_level.add_formula(key1 + key2, new_formula_structure)
 
                         new_formula = tree_formula("∧", formula2.formula, formula1.formula)
                         new_formula_structure = LogicalStructure(formula1.characters + formula2.characters + 3, new_formula)
-                        variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1, formula1.characters + formula2.characters + 3, total_tautologies, total_formulas, level)
+                        variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1, formula1.characters + formula2.characters + 3, level)
                         current_recursive_level.add_formula(key1 + key2, new_formula_structure)
 
                         new_formula = tree_formula("∨", formula1.formula, formula2.formula)
                         new_formula_structure = LogicalStructure(formula1.characters + formula2.characters + 3, new_formula)
-                        variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1, formula1.characters + formula2.characters + 3, total_tautologies, total_formulas, level)
+                        variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1, formula1.characters + formula2.characters + 3, level)
                         current_recursive_level.add_formula(key1 + key2, new_formula_structure)
 
                         new_formula = tree_formula("∨", formula2.formula, formula1.formula)
                         new_formula_structure = LogicalStructure(formula1.characters + formula2.characters + 3, new_formula)
-                        variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1, formula1.characters + formula2.characters + 3, total_tautologies, total_formulas, level)
+                        variables_substitution(key1 + key2, new_formula_structure.formula.copy(), 1, 1, formula1.characters + formula2.characters + 3, level)
                         current_recursive_level.add_formula(key1 + key2, new_formula_structure)
     
     list_objects.append(previous_recursive_level)
@@ -122,18 +125,15 @@ def pattern_rules(level, total_tautologies, total_formulas):
     file_to_store.close()
 
 def formula_generator():
-    # dictinary for storing the total number of tautologies found,
-    # where the key is the recursive level, and the value a counter for that level
-    total_tautologies = {} 
-    # dictinary for storing the total number of formulas generated,
-    # where the key is the recursive level, and the value a counter for that level
-    total_formulas = {}
 
-    generate_initial_level(total_tautologies, total_formulas)
+    # generate recusrive levels 0 and 1
+    generate_initial_level()
     level = 2
 
+    
     while True:
-        pattern_rules(level, total_tautologies, total_formulas)
+        # generate all recursive levels in increasing order
+        pattern_rules(level)
         level += 1
     
     

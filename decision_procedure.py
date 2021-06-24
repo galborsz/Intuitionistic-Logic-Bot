@@ -15,7 +15,7 @@ class Interpretation:
     def __init__(self):
         self.removable_formulas = []
         self.permanent_formulas = []
-        self.worlds = 0 # use it as a counter instead of as a list
+        self.worlds = 0
         self.relations = set()
         self.valuations = {}
         self.used_relations = set()
@@ -28,14 +28,7 @@ class Interpretation:
     
     def add_permanent_formula(self, formula):
         if formula not in self.permanent_formulas:
-            #print("adding: ")
-            #formula.tree.inorder()
-            #print(" ", formula.world, " \n")
             self.permanent_formulas.append(formula)
-        #else:
-            #print("not added: ")
-            #formula.tree.inorder()
-            #print(" ", formula.world, " \n")
     
     def add_world(self):
         self.worlds += 1
@@ -45,13 +38,10 @@ class Interpretation:
     
     def add_relation(self, first_world, second_world):
         self.relations.add(tuple([first_world, second_world]))
-        #if tuple([first_world, second_world]) not in self.relations:
-            #self.relations.append(tuple([first_world, second_world]))
     
+    # for keeping track of the relations already used by the permanent formulas
     def add_used_relation(self, first_world, second_world):
         self.used_relations.add(tuple([first_world, second_world]))
-        #if tuple([first_world, second_world]) not in self.used_relations:
-            #self.used_relations.append(tuple([first_world, second_world]))
         
     def add_valuation(self, variable, world, value):
         if (variable, world) in self.valuations:
@@ -61,6 +51,7 @@ class Interpretation:
             self.valuations[(variable, world)] = value
             return True
 
+# create initial list of the tableau
 def create_initial_tableau_node(formula):
     tableau_node = Interpretation()
     tableau_node.add_removable_formula(Formula(formula, 0, False))
@@ -78,21 +69,15 @@ def copy_interpretation(old_interpretation):
     new_interpretation.valuations = old_interpretation.valuations.copy()
     return new_interpretation
 
+# application of the tableau rules
 def rules(old_interpretation, formula, connective, interpretations):
     if connective == '⊐' and formula.assignation == False:
         if old_interpretation.permanent_formulas and decision_procedure(formula.tree) == True: # if world generator is a tautology, there won't be an infinite branch
-            #print("tautological generator found: ")
-            #formula.tree.inorder()
-            #print("\n")
             old_interpretation.tautology_world_generator_present = True
         elif old_interpretation.permanent_formulas and decision_procedure(formula.tree) == False:
-            #print("generator found: ")
-            #formula.tree.inorder()
-            #print("\n")
             old_interpretation.world_generator_present = True
         old_interpretation.add_removable_formula(Formula(formula.tree.left, old_interpretation.worlds + 1, True))
         old_interpretation.add_removable_formula(Formula(formula.tree.right, old_interpretation.worlds + 1, False))
-        #print("new relation: ", formula.world, old_interpretation.worlds + 1)
         old_interpretation.add_relation(formula.world, old_interpretation.worlds + 1)
         old_interpretation.add_world()
         interpretations.append(old_interpretation)
@@ -102,23 +87,18 @@ def rules(old_interpretation, formula, connective, interpretations):
         old_interpretation.add_permanent_formula(formula)
         new_interpretation = copy_interpretation(old_interpretation)
 
+        # determine possible accessible worlds not used before
         possible_relations = set()
         for relation in old_interpretation.relations:
-            #print("relation here: ", relation[0], relation[1])
             if relation not in old_interpretation.used_relations:
                 if relation[0] == formula.world:
-                    #print("relation added: ", relation[0], relation[1])
                     possible_relations.add(relation)
         
+        # not possible to extend permanent formulas so it is not a tautology
         if not possible_relations:
-            #print("end2")
             return False
 
-        count = 0
         for relation in possible_relations:
-            #print("count: ", count)
-            #count += 1
-            #print("relation ⊐: ", relation[0], relation[1])
             old_interpretation.add_used_relation(relation[0], relation[1])
             new_interpretation.add_used_relation(relation[0], relation[1])
             old_interpretation.add_removable_formula(Formula(formula.tree.left, relation[1], False))
@@ -129,19 +109,19 @@ def rules(old_interpretation, formula, connective, interpretations):
 
     elif connective == '∼' and formula.assignation == True: 
         old_interpretation.add_permanent_formula(formula)
+        
+        # determine possible accessible worlds not used before
         possible_relations = set()
         for relation in old_interpretation.relations:
             if relation not in old_interpretation.used_relations:
                 if relation[0] == formula.world:
-                    #print("here relation added: ", relation[0], relation[1])
                     possible_relations.add(relation)
         
+        # not possible to extend permanent formulas so it is not a tautology
         if not possible_relations:
-            #print("end1")
             return False
 
         for relation in possible_relations:
-            #print("relation ∼: ", relation[0], relation[1])
             old_interpretation.add_used_relation(relation[0],  relation[1])
             old_interpretation.add_removable_formula(Formula(formula.tree.right, relation[1], False))
         interpretations.append(old_interpretation)
@@ -149,18 +129,12 @@ def rules(old_interpretation, formula, connective, interpretations):
 
     elif connective == '∼' and formula.assignation == False:
         if old_interpretation.permanent_formulas and decision_procedure(formula.tree) == True: # if world generator is a tautology, there won't be an infinite branch
-            #print("tautological generator found: ")
-            #formula.tree.inorder()
-            #print("\n")
             old_interpretation.tautology_world_generator_present = True
         elif old_interpretation.permanent_formulas and decision_procedure(formula.tree) == False:
-            #print("generator found: ")
-            #formula.tree.inorder()
-            #print("\n")
             old_interpretation.world_generator_present = True
         old_interpretation.add_removable_formula(Formula(formula.tree.right, old_interpretation.worlds + 1, True))
         old_interpretation.add_relation(formula.world, old_interpretation.worlds + 1)
-        old_interpretation.add_world() # make sure this is correct
+        old_interpretation.add_world()
         interpretations.append(old_interpretation)
         return interpretations
     
@@ -192,6 +166,7 @@ def rules(old_interpretation, formula, connective, interpretations):
         interpretations.append(old_interpretation)
         return interpretations
 
+# application of the transitivity and heredity rules, as well as extension of the permanent formulas if necessary
 def no_more_formulas(old_interpretation, interpretations):
     new_transitivity_relations = []
     # transitivity rule
@@ -220,58 +195,40 @@ def no_more_formulas(old_interpretation, interpretations):
     for variable, world in zip(variables, worlds):
         added = old_interpretation.add_valuation(variable, world, True)
         if added == False:
-            #print("closed2")
             return interpretations # the branch is closed, so we can get rid of it
     
-    #print("worlds: ", old_interpretation.worlds) 
-    #if old_interpretation.worlds > 30:
-        #print("infinite")
-        #return False 
 
     # apply rule again to permanent formulas (only if there are relations that have not been applied yet)
     for formula in old_interpretation.permanent_formulas:
-        #print("permanent")
         possible_relations = set()
         for relation in old_interpretation.relations:
             if relation not in old_interpretation.used_relations:
                 if relation[0] == formula.world:
-                    #print("relation added: ", relation[0], relation[1])
                     possible_relations.add(relation)
-                    #old_interpretation.add_used_relation(relation[0], relation[1])
         
         if possible_relations:
-            #old_interpretation.relations = possible_relations
-            #print(interpretations)
-            #print("possible")
-            #formula.tree.inorder()
             if old_interpretation.tautology_world_generator_present:
                 return interpretations # branch closed bc world generator is a tautology
 
             # if there is no tautological world generator, check whether there are still removable formulas to work with
             # if it was not infinite, it would have closed already
             elif not old_interpretation.removable_formulas and old_interpretation.world_generator_present:
-                print("infinite")
                 return False # infinite branch, not a tautology
             return rules(old_interpretation, formula, formula.tree.data, interpretations)
-        #else:
-            #print("not possible")
-        #if not operator.eq(set(possible_relations),set(old_interpretation.used_relations)):
-            #return rules(old_interpretation, formula, formula.tree.data, interpretations)
     
     return False # no contradiction found, so it is not a tautology
 
-def apply_rule(interpretations):
+def apply_procedure(interpretations):
     old_interpretation = interpretations.pop()
     if old_interpretation.removable_formulas:
         formula = old_interpretation.removable_formulas.pop(0)
         connective = formula.tree.data
-        if connective in connectives:
+        if connective in connectives: # apply rule assigned to connective
             return rules(old_interpretation, formula, connective, interpretations)
     
         elif connective in alphabet: # no connective left, add valuations
             added = old_interpretation.add_valuation(connective, formula.world, formula.assignation)
             if added == False:
-                #print("closed")
                 return interpretations # the branch is closed, so we can get rid of it
             interpretations.append(old_interpretation)
             return interpretations
@@ -287,9 +244,8 @@ def decision_procedure(tree):
     initial_node = create_initial_tableau_node(tree)
     interpretations.append(initial_node)
     while interpretations:
-        interpretations = apply_rule(interpretations)
+        interpretations = apply_procedure(interpretations)
         if interpretations == False: # process should stop because the branch is open
-            #print("end")
             return False # it is not a tautology
         elif not interpretations:
             return True # it is a tautology
