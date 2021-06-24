@@ -1,5 +1,4 @@
 from formula_generation import formula_generator
-import tracemalloc
 
 def main():
     formula_generator()

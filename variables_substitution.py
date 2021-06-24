@@ -3,8 +3,7 @@ import tweepy
 from decision_procedure import decision_procedure
 from tree_node import treeToString
 from keys_format import *
-import time
-import globals 
+import time 
 
 
 # global variables

@@ -2,8 +2,6 @@ from recursive_levels import ComplexityLevel, LogicalStructure
 from tree_node import TreeNode, tree_formula
 from variables_substitution import variables_substitution
 import pickle
-from time import process_time
-import globals
 
 def generate_initial_level():
     file_to_store = open("stored_object.pickle", "wb")
@@ -17,7 +15,6 @@ def generate_initial_level():
 
     # initialize recursive level 1
     recursive_level_1 = ComplexityLevel(1)
-    globals.start_time_generation = process_time()
     formula = LogicalStructure(4, tree_formula("∼", None, "*"))
     variables_substitution(1, formula.formula.copy(), 1, 1, 4, 1)
     recursive_level_1.add_formula(1, formula)
@@ -38,7 +35,7 @@ def generate_initial_level():
     pickle.dump(list_objects, file_to_store)
     file_to_store.close()
 
-def pattern_rules(level, total_tautologies, total_formulas):
+def pattern_rules(level):
     file_to_read = open("stored_object.pickle", "rb")
     loaded_object = pickle.load(file_to_read)
     previous_recursive_level = loaded_object[level - 1]
